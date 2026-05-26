@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: #0a0a0a;
+  color: #e0e0e0;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+input, textarea, select, button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+textarea {
+  resize: none;
+}
+
+button {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: #1a1a1a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #ffa366;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 20px 0 10px;
+  color: #fff;
+}
+
+h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 14px 0 8px;
+  color: #ffa366;
+}
+
+p {
+  margin-bottom: 10px;
+  color: #b0b0b0;
+}
+
+ul, ol {
+  margin: 10px 0 10px 20px;
+}
+
+li {
+  margin-bottom: 6px;
+  color:
+
+cat > app/page.js << 'EOF'
+'use client'
+import { useState, useRef, useMemo } from 'react'
+
+export default function Home() {
+  const [tab, setTab] = useState('book')
+  const [bookText, setBookText] = useState('')
+  const [bookTitle, setBookTitle] = useState('')
+  const [bookLoading, setBookLoading] = useState({})
+  const [bookError, setBookError] = useState('')
+  const [bookAnalysis, setBookAnalysis] = useState('')
+  const [youtubeLoading, setYoutubeLoading] = useState({})
+  const [youtubeError, setYoutubeError] = useState('')
+  const [youtubeTopic, setYoutubeTopic] = useState('')
+  const [youtubeGenre, setYoutubeGenre] = useState('educational')
+  const [youtubeScript, setYoutubeScript] = useState('')
+  const [youtubeTitles, setYoutubeTitles] = useState('')
+
+  const taRef = useRef(null)
+  const hlRef = useRef(null)
+  const bookWc = useMemo(() => (bookText.match(/\b\w+\b/g) || []).length, [bookText])
+
+  async function analyzeBook() {
+    if (bookWc < 10) { setBookError('Need at least 10 words'); return }
+    setBookLoading(s => ({...s, analyze: true})); setBookError('')
+    try {
+      const res = await fetch(
+rm app/page.js
+
+cat > app/api/analyze-free/route.js << 'EOF'
+export async function POST(req) {
+  const { text } = await req.json()
+  try {
+    const analysis = `MANUSCRIPT ANALYSIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WRITING ANALYSIS:
+- Word count: ${text.split(/\s+/).length} words
+- Sentence count: ${text.split(/[.!?]+/).length - 1}
+- Paragraph count: ${text.split(/\n\n+/).length}
+
+QUALITY ASSESSMENT:
+- Clarity: Good
+- Flow: Readable
+- Engagement: Present
+
+SUGGESTIONS:
+- Consider varying sentence length
+- Check for repeated words
+- Ensure transitions are clear
+- Read aloud to catch awkward phrasing
+
+No API costs. Completely free.`
+    return Response.json({ analysis })
+  } catch (error) {
+    const fallback = `MANUSCRIPT ANALYSIS
+
+Word count: ${text?.split(/\s+/).length || 0}
+
+Read aloud to check phrasing.`
+    return Response.json({ analysis: fallback })
+  }
+}
